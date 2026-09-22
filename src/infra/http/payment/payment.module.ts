@@ -9,6 +9,7 @@ import { PrismaModule } from '../../database/prisma/prisma.module';
 import { PrismaPaymentRepository } from '../../database/prisma/repositories/prisma-payment.repository';
 import { PaymentController } from './payment.controller';
 import { GetPaymentByIdUseCase } from '../../../application/payment/use-cases/get-payment-by-id.use-case';
+import { ListPaymentsUseCase } from '../../../application/payment/use-cases/list-payments.use-case';
 
 @Module({
   imports: [PrismaModule],
@@ -32,8 +33,15 @@ import { GetPaymentByIdUseCase } from '../../../application/payment/use-cases/ge
       },
       inject: [PAYMENT_REPOSITORY],
     },
+    {
+      provide: ListPaymentsUseCase,
+      useFactory: (paymentRepository: PaymentRepository) => {
+        return new ListPaymentsUseCase(paymentRepository);
+      },
+      inject: [PAYMENT_REPOSITORY],
+    },
   ],
-  exports: [CreatePaymentUseCase, GetPaymentByIdUseCase],
+  exports: [CreatePaymentUseCase, GetPaymentByIdUseCase, ListPaymentsUseCase],
   controllers: [PaymentController],
 })
-export class PaymentModule {}
+export class PaymentModule { }
