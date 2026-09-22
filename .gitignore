@@ -1,2 +1,4 @@
 dist/
 *.tsbuildinfo
+/generated/prisma
+.env
