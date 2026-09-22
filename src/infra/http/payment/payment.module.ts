@@ -20,6 +20,16 @@ import {
 } from '../../../application/payment/ports/credit-card-checkout.gateway.token';
 import { MercadoPagoCreditCardCheckoutGateway } from '../../payment-gateways/mercado-pago/mercado-pago-credit-card-checkout.gateway';
 
+import { ProcessProviderPaymentNotificationUseCase } from '../../../application/payment/use-cases/process-provider-payment-notification.use-case';
+import {
+  PaymentProviderGateway,
+} from '../../../application/payment/ports/payment-provider.gateway';
+import {
+  PAYMENT_PROVIDER_GATEWAY,
+} from '../../../application/payment/ports/payment-provider.gateway.token';
+
+import { MercadoPagoWebhookController } from '../webhooks/mercado-pago-webhook.controller';
+
 @Module({
   imports: [PrismaModule],
   providers: [
@@ -74,8 +84,25 @@ import { MercadoPagoCreditCardCheckoutGateway } from '../../payment-gateways/mer
       },
       inject: [PAYMENT_REPOSITORY, CREDIT_CARD_CHECKOUT_GATEWAY],
     },
+    {
+      provide: PAYMENT_PROVIDER_GATEWAY,
+      useExisting: MercadoPagoCreditCardCheckoutGateway,
+    },
+    {
+      provide: ProcessProviderPaymentNotificationUseCase,
+      useFactory: (
+        paymentRepository: PaymentRepository,
+        paymentProviderGateway: PaymentProviderGateway,
+      ) => {
+        return new ProcessProviderPaymentNotificationUseCase(
+          paymentRepository,
+          paymentProviderGateway,
+        );
+      },
+      inject: [PAYMENT_REPOSITORY, PAYMENT_PROVIDER_GATEWAY],
+    },
   ],
-  exports: [CreatePaymentUseCase, GetPaymentByIdUseCase, ListPaymentsUseCase, UpdatePaymentStatusUseCase, StartCreditCardCheckoutUseCase,],
-  controllers: [PaymentController],
+  exports: [CreatePaymentUseCase, GetPaymentByIdUseCase, ListPaymentsUseCase, UpdatePaymentStatusUseCase, StartCreditCardCheckoutUseCase, ProcessProviderPaymentNotificationUseCase,],
+  controllers: [PaymentController, MercadoPagoWebhookController],
 })
 export class PaymentModule { }
