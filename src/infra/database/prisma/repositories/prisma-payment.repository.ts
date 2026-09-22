@@ -32,6 +32,7 @@ export class PrismaPaymentRepository implements PaymentRepository {
     await this.prisma.payment.create({
       data: {
         id: payment.id,
+        idempotencyKey: payment.idempotencyKey,
         cpf: payment.cpf,
         description: payment.description,
         amountInCents: payment.amountInCents,
@@ -52,6 +53,7 @@ export class PrismaPaymentRepository implements PaymentRepository {
 
     return new Payment({
       id: payment.id,
+      idempotencyKey: payment.idempotencyKey,
       cpf: payment.cpf,
       description: payment.description,
       amountInCents: payment.amountInCents,
@@ -81,6 +83,7 @@ export class PrismaPaymentRepository implements PaymentRepository {
       (payment) =>
         new Payment({
           id: payment.id,
+          idempotencyKey: payment.idempotencyKey,
           cpf: payment.cpf,
           description: payment.description,
           amountInCents: payment.amountInCents,
@@ -100,6 +103,30 @@ export class PrismaPaymentRepository implements PaymentRepository {
       data: {
         status: paymentStatusMap[payment.status],
       },
+    });
+  }
+
+  async findByIdempotencyKey(key: string): Promise<Payment | null> {
+    const payment = await this.prisma.payment.findUnique({
+      where: {
+        idempotencyKey: key,
+      },
+    });
+
+    if (!payment) {
+      return null;
+    }
+
+    return new Payment({
+      id: payment.id,
+      idempotencyKey: payment.idempotencyKey,
+      cpf: payment.cpf,
+      description: payment.description,
+      amountInCents: payment.amountInCents,
+      paymentMethod: payment.paymentMethod as PaymentMethod,
+      status: payment.status as PaymentStatus,
+      createdAt: payment.createdAt,
+      updatedAt: payment.updatedAt,
     });
   }
 }

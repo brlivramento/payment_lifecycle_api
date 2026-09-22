@@ -3,6 +3,7 @@ import { PaymentStatus } from '../enums/payment-status.enum';
 
 export interface PaymentProps {
   id: string;
+  idempotencyKey: string | null;
   cpf: string;
   description: string;
   amountInCents: number;
@@ -21,6 +22,10 @@ export class Payment {
 
   get id(): string {
     return this.props.id;
+  }
+
+  get idempotencyKey(): string | null {
+    return this.props.idempotencyKey;
   }
 
   get cpf(): string {

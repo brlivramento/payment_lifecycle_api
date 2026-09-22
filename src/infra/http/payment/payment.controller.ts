@@ -8,6 +8,8 @@ import {
   Post,
   Put,
   Query,
+  BadRequestException,
+  Headers,
 } from '@nestjs/common';
 import {
   ApiOperation,
@@ -15,6 +17,7 @@ import {
   ApiQuery,
   ApiResponse,
   ApiTags,
+  ApiHeader,
 } from '@nestjs/swagger';
 
 import { CreatePaymentUseCase } from '../../../application/payment/use-cases/create-payment.use-case';
@@ -34,14 +37,38 @@ export class PaymentController {
     private readonly getPaymentByIdUseCase: GetPaymentByIdUseCase,
     private readonly listPaymentsUseCase: ListPaymentsUseCase,
     private readonly updatePaymentStatusUseCase: UpdatePaymentStatusUseCase,
-  ) {}
+  ) { }
 
   @Post()
   @ApiOperation({ summary: 'Cria um novo pagamento' })
+  @ApiHeader({
+    name: 'Idempotency-Key',
+    required: true,
+    description: 'Chave única que identifica uma tentativa de criação de pagamento.',
+    example: '0b4b2ca6-9706-4c51-8446-35fed8e50450',
+  })
   @ApiResponse({ status: 201, description: 'Pagamento criado como PENDING.' })
   @ApiResponse({ status: 400, description: 'Dados de entrada inválidos.' })
-  async create(@Body() dto: CreatePaymentDto) {
+  @Post()
+  @ApiOperation({ summary: 'Cria um novo pagamento' })
+  @ApiHeader({
+    name: 'Idempotency-Key',
+    required: true,
+    description: 'Chave única que identifica uma tentativa de criação de pagamento.',
+    example: '0b4b2ca6-9706-4c51-8446-35fed8e50450',
+  })
+  @ApiResponse({ status: 201, description: 'Pagamento criado como PENDING.' })
+  @ApiResponse({ status: 400, description: 'Dados de entrada inválidos.' })
+  async create(
+    @Headers('idempotency-key') idempotencyKey: string | undefined,
+    @Body() dto: CreatePaymentDto,
+  ) {
+    if (!idempotencyKey?.trim()) {
+      throw new BadRequestException('Idempotency-Key header is required');
+    }
+
     const payment = await this.createPaymentUseCase.execute({
+      idempotencyKey,
       cpf: dto.cpf,
       description: dto.description,
       amountInCents: Math.round(dto.amount * 100),

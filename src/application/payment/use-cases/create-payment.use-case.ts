@@ -6,6 +6,7 @@ import { PaymentStatus } from '../../../domain/payment/enums/payment-status.enum
 import { PaymentRepository } from '../ports/payment-repository';
 
 interface CreatePaymentInput {
+  idempotencyKey: string;
   cpf: string;
   description: string;
   amountInCents: number;
@@ -13,13 +14,21 @@ interface CreatePaymentInput {
 }
 
 export class CreatePaymentUseCase {
-  constructor(private readonly paymentRepository: PaymentRepository) {}
+  constructor(private readonly paymentRepository: PaymentRepository) { }
 
   async execute(input: CreatePaymentInput): Promise<Payment> {
     const now = new Date();
 
+    const existingPayment =
+      await this.paymentRepository.findByIdempotencyKey(input.idempotencyKey);
+
+    if (existingPayment) {
+      return existingPayment;
+    }
+
     const payment = new Payment({
       id: randomUUID(),
+      idempotencyKey: input.idempotencyKey,
       cpf: input.cpf,
       description: input.description,
       amountInCents: input.amountInCents,

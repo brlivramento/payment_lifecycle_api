@@ -20,6 +20,7 @@ enum PaymentStatus {
 
 model Payment {
   id            String        @id @default(uuid()) @db.Uuid
+  idempotencyKey String?       @unique @map("idempotency_key") @db.VarChar(255)
   cpf           String        @db.VarChar(11)
   description   String
   amountInCents Int           @map("amount_in_cents")

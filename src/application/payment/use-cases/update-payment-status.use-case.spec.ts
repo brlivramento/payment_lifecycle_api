@@ -39,6 +39,14 @@ class InMemoryPaymentRepository implements PaymentRepository {
       this.payments[index] = payment;
     }
   }
+
+  async findByIdempotencyKey(key: string): Promise<Payment | null> {
+    return (
+      this.payments.find(
+        (payment) => payment.idempotencyKey === key,
+      ) ?? null
+    );
+  }
 }
 
 describe('UpdatePaymentStatusUseCase', () => {
@@ -50,6 +58,7 @@ describe('UpdatePaymentStatusUseCase', () => {
     );
 
     const createdPayment = await createPaymentUseCase.execute({
+      idempotencyKey: 'test-update-payment-001',
       cpf: '12345678901',
       description: 'Pagamento de teste',
       amountInCents: 4990,

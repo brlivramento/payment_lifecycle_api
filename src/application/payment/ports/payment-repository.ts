@@ -11,4 +11,5 @@ export interface PaymentRepository {
   findById(id: string): Promise<Payment | null>;
   list(filters: ListPaymentsFilters): Promise<Payment[]>;
   update(payment: Payment): Promise<void>;
+  findByIdempotencyKey(key: string): Promise<Payment | null>;
 }
