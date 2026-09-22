@@ -11,6 +11,14 @@ import { PaymentController } from './payment.controller';
 import { GetPaymentByIdUseCase } from '../../../application/payment/use-cases/get-payment-by-id.use-case';
 import { ListPaymentsUseCase } from '../../../application/payment/use-cases/list-payments.use-case';
 import { UpdatePaymentStatusUseCase } from '../../../application/payment/use-cases/update-payment-status.use-case';
+import { StartCreditCardCheckoutUseCase } from '../../../application/payment/use-cases/start-credit-card-checkout.use-case';
+import {
+  CreditCardCheckoutGateway,
+} from '../../../application/payment/ports/credit-card-checkout.gateway';
+import {
+  CREDIT_CARD_CHECKOUT_GATEWAY,
+} from '../../../application/payment/ports/credit-card-checkout.gateway.token';
+import { MercadoPagoCreditCardCheckoutGateway } from '../../payment-gateways/mercado-pago/mercado-pago-credit-card-checkout.gateway';
 
 @Module({
   imports: [PrismaModule],
@@ -48,8 +56,26 @@ import { UpdatePaymentStatusUseCase } from '../../../application/payment/use-cas
       },
       inject: [PAYMENT_REPOSITORY],
     },
+    MercadoPagoCreditCardCheckoutGateway,
+    {
+      provide: CREDIT_CARD_CHECKOUT_GATEWAY,
+      useExisting: MercadoPagoCreditCardCheckoutGateway,
+    },
+    {
+      provide: StartCreditCardCheckoutUseCase,
+      useFactory: (
+        paymentRepository: PaymentRepository,
+        creditCardCheckoutGateway: CreditCardCheckoutGateway,
+      ) => {
+        return new StartCreditCardCheckoutUseCase(
+          paymentRepository,
+          creditCardCheckoutGateway,
+        );
+      },
+      inject: [PAYMENT_REPOSITORY, CREDIT_CARD_CHECKOUT_GATEWAY],
+    },
   ],
-  exports: [CreatePaymentUseCase, GetPaymentByIdUseCase, ListPaymentsUseCase, UpdatePaymentStatusUseCase],
+  exports: [CreatePaymentUseCase, GetPaymentByIdUseCase, ListPaymentsUseCase, UpdatePaymentStatusUseCase, StartCreditCardCheckoutUseCase,],
   controllers: [PaymentController],
 })
 export class PaymentModule { }

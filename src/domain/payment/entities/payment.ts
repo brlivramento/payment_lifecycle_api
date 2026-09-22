@@ -4,6 +4,8 @@ import { PaymentStatus } from '../enums/payment-status.enum';
 export interface PaymentProps {
   id: string;
   idempotencyKey: string | null;
+  providerPreferenceId: string | null;
+  checkoutUrl: string | null;
   cpf: string;
   description: string;
   amountInCents: number;
@@ -28,6 +30,14 @@ export class Payment {
     return this.props.idempotencyKey;
   }
 
+  get providerPreferenceId(): string | null {
+    return this.props.providerPreferenceId;
+  }
+
+  get checkoutUrl(): string | null {
+    return this.props.checkoutUrl;
+  }
+
   get cpf(): string {
     return this.props.cpf;
   }
@@ -50,6 +60,15 @@ export class Payment {
 
   updateStatus(status: PaymentStatus): void {
     this.props.status = status;
+    this.props.updatedAt = new Date();
+  }
+
+  setCreditCardCheckout(
+    providerPreferenceId: string,
+    checkoutUrl: string,
+  ): void {
+    this.props.providerPreferenceId = providerPreferenceId;
+    this.props.checkoutUrl = checkoutUrl;
     this.props.updatedAt = new Date();
   }
 }

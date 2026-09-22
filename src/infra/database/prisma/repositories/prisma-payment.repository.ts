@@ -33,6 +33,8 @@ export class PrismaPaymentRepository implements PaymentRepository {
       data: {
         id: payment.id,
         idempotencyKey: payment.idempotencyKey,
+        providerPreferenceId: payment.providerPreferenceId,
+        checkoutUrl: payment.checkoutUrl,
         cpf: payment.cpf,
         description: payment.description,
         amountInCents: payment.amountInCents,
@@ -54,6 +56,8 @@ export class PrismaPaymentRepository implements PaymentRepository {
     return new Payment({
       id: payment.id,
       idempotencyKey: payment.idempotencyKey,
+      providerPreferenceId: payment.providerPreferenceId,
+      checkoutUrl: payment.checkoutUrl,
       cpf: payment.cpf,
       description: payment.description,
       amountInCents: payment.amountInCents,
@@ -84,6 +88,8 @@ export class PrismaPaymentRepository implements PaymentRepository {
         new Payment({
           id: payment.id,
           idempotencyKey: payment.idempotencyKey,
+          providerPreferenceId: payment.providerPreferenceId,
+          checkoutUrl: payment.checkoutUrl,
           cpf: payment.cpf,
           description: payment.description,
           amountInCents: payment.amountInCents,
@@ -102,6 +108,8 @@ export class PrismaPaymentRepository implements PaymentRepository {
       },
       data: {
         status: paymentStatusMap[payment.status],
+        providerPreferenceId: payment.providerPreferenceId,
+        checkoutUrl: payment.checkoutUrl,
       },
     });
   }
@@ -120,6 +128,8 @@ export class PrismaPaymentRepository implements PaymentRepository {
     return new Payment({
       id: payment.id,
       idempotencyKey: payment.idempotencyKey,
+      providerPreferenceId: payment.providerPreferenceId,
+      checkoutUrl: payment.checkoutUrl,
       cpf: payment.cpf,
       description: payment.description,
       amountInCents: payment.amountInCents,

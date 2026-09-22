@@ -29,6 +29,8 @@ export class CreatePaymentUseCase {
     const payment = new Payment({
       id: randomUUID(),
       idempotencyKey: input.idempotencyKey,
+      providerPreferenceId: null,
+      checkoutUrl: null,
       cpf: input.cpf,
       description: input.description,
       amountInCents: input.amountInCents,
