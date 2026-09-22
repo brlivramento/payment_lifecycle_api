@@ -91,4 +91,15 @@ export class PrismaPaymentRepository implements PaymentRepository {
         }),
     );
   }
+
+  async update(payment: Payment): Promise<void> {
+    await this.prisma.payment.update({
+      where: {
+        id: payment.id,
+      },
+      data: {
+        status: paymentStatusMap[payment.status],
+      },
+    });
+  }
 }

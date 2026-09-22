@@ -10,4 +10,5 @@ export interface PaymentRepository {
   save(payment: Payment): Promise<void>;
   findById(id: string): Promise<Payment | null>;
   list(filters: ListPaymentsFilters): Promise<Payment[]>;
+  update(payment: Payment): Promise<void>;
 }
