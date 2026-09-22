@@ -1,0 +1,12 @@
+/*
+  Warnings:
+
+  - A unique constraint covering the columns `[provider_preference_id]` on the table `payments` will be added. If there are existing duplicate values, this will fail.
+
+*/
+-- AlterTable
+ALTER TABLE "payments" ADD COLUMN     "checkout_url" TEXT,
+ADD COLUMN     "provider_preference_id" TEXT;
+
+-- CreateIndex
+CREATE UNIQUE INDEX "payments_provider_preference_id_key" ON "payments"("provider_preference_id");

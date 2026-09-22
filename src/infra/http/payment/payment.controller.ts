@@ -28,6 +28,7 @@ import { PaymentMethod } from '../../../domain/payment/enums/payment-method.enum
 import { CreatePaymentDto } from './dto/create-payment.dto';
 import { ListPaymentsDto } from './dto/list-payments.dto';
 import { UpdatePaymentStatusDto } from './dto/update-payment-status.dto';
+import { StartCreditCardCheckoutUseCase } from '../../../application/payment/use-cases/start-credit-card-checkout.use-case';
 
 @ApiTags('Payments')
 @Controller('api/payment')
@@ -37,18 +38,9 @@ export class PaymentController {
     private readonly getPaymentByIdUseCase: GetPaymentByIdUseCase,
     private readonly listPaymentsUseCase: ListPaymentsUseCase,
     private readonly updatePaymentStatusUseCase: UpdatePaymentStatusUseCase,
+    private readonly startCreditCardCheckoutUseCase: StartCreditCardCheckoutUseCase,
   ) { }
 
-  @Post()
-  @ApiOperation({ summary: 'Cria um novo pagamento' })
-  @ApiHeader({
-    name: 'Idempotency-Key',
-    required: true,
-    description: 'Chave única que identifica uma tentativa de criação de pagamento.',
-    example: '0b4b2ca6-9706-4c51-8446-35fed8e50450',
-  })
-  @ApiResponse({ status: 201, description: 'Pagamento criado como PENDING.' })
-  @ApiResponse({ status: 400, description: 'Dados de entrada inválidos.' })
   @Post()
   @ApiOperation({ summary: 'Cria um novo pagamento' })
   @ApiHeader({
@@ -67,13 +59,24 @@ export class PaymentController {
       throw new BadRequestException('Idempotency-Key header is required');
     }
 
-    const payment = await this.createPaymentUseCase.execute({
+    let payment = await this.createPaymentUseCase.execute({
       idempotencyKey,
       cpf: dto.cpf,
       description: dto.description,
       amountInCents: Math.round(dto.amount * 100),
       paymentMethod: dto.paymentMethod,
     });
+
+    if (payment.paymentMethod === PaymentMethod.CREDIT_CARD) {
+      const paymentWithCheckout =
+        await this.startCreditCardCheckoutUseCase.execute(payment.id);
+
+      if (!paymentWithCheckout) {
+        throw new NotFoundException('Payment not found');
+      }
+
+      payment = paymentWithCheckout;
+    }
 
     return this.present(payment);
   }
@@ -137,6 +140,7 @@ export class PaymentController {
     amountInCents: number;
     paymentMethod: string;
     status: string;
+    checkoutUrl: string | null;
   }) {
     return {
       id: payment.id,
@@ -145,6 +149,7 @@ export class PaymentController {
       amount: payment.amountInCents / 100,
       paymentMethod: payment.paymentMethod,
       status: payment.status,
+      ...(payment.checkoutUrl ? { checkoutUrl: payment.checkoutUrl } : {}),
     };
   }
 }
