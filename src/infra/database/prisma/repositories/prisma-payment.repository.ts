@@ -37,4 +37,25 @@ export class PrismaPaymentRepository implements PaymentRepository {
       },
     });
   }
+
+  async findById(id: string): Promise<Payment | null> {
+    const payment = await this.prisma.payment.findUnique({
+      where: { id },
+    });
+
+    if (!payment) {
+      return null;
+    }
+
+    return new Payment({
+      id: payment.id,
+      cpf: payment.cpf,
+      description: payment.description,
+      amountInCents: payment.amountInCents,
+      paymentMethod: payment.paymentMethod as PaymentMethod,
+      status: payment.status as PaymentStatus,
+      createdAt: payment.createdAt,
+      updatedAt: payment.updatedAt,
+    });
+  }
 }
