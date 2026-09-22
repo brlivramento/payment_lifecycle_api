@@ -1,12 +1,11 @@
-import { IsEnum, IsOptional, Matches } from 'class-validator';
+import { IsEnum, IsOptional } from 'class-validator';
+import { IsCpf } from '../validators/is-cpf.decorator';
 
 import { PaymentMethod } from '../../../../domain/payment/enums/payment-method.enum';
 
 export class ListPaymentsDto {
   @IsOptional()
-  @Matches(/^\d{11}$/, {
-    message: 'cpf must contain exactly 11 digits',
-  })
+  @IsCpf()
   cpf?: string;
 
   @IsOptional()
