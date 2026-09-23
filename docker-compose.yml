@@ -19,6 +19,7 @@ services:
     depends_on:
       postgres:
         condition: service_healthy
+    command: sh -c "npx prisma generate && npx prisma migrate deploy && npm run start:dev"
 
   postgres:
     image: postgres:16-alpine
