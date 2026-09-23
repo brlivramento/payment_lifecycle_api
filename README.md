@@ -57,6 +57,7 @@ docker compose exec api npx prisma migrate dev
 ```
 
 - API: `http://localhost:3000`
+- Health: `http://localhost:3000/health`
 - Swagger: `http://localhost:3000/api/docs`
 
 ## Endpoints
