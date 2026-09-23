@@ -12,7 +12,6 @@ Credit card payments use Mercado Pago Checkout Pro. Payment status updates are h
 ![Prisma](https://img.shields.io/badge/Prisma-2D3748?style=for-the-badge&logo=prisma&logoColor=white)
 ![Docker](https://img.shields.io/badge/Docker-2496ED?style=for-the-badge&logo=docker&logoColor=white)
 ![Jest](https://img.shields.io/badge/Jest-C21325?style=for-the-badge&logo=jest&logoColor=white)
-![Mercado Pago](https://img.shields.io/badge/Mercado%20Pago-009EE3?style=for-the-badge&logo=mercadopago&logoColor=white)
 ![Swagger](https://img.shields.io/badge/Swagger-85EA2D?style=for-the-badge&logo=swagger&logoColor=black)
 
 ## Architecture
@@ -28,32 +27,25 @@ flowchart LR
 
 ## Run locally
 
-Create your environment file:
+#### 1. Create your environment file:
 
 ```bash
 cp .env.example .env
 ```
 
-Configure the required values:
+#### 2. Configure the required values:
 
 ```env
-DATABASE_URL="postgresql://payments:payments@postgres:5432/payments?schema=public"
 
 MERCADO_PAGO_ACCESS_TOKEN=
 MERCADO_PAGO_WEBHOOK_SECRET=
 MERCADO_PAGO_WEBHOOK_URL=
 ```
 
-Start the application:
+#### 3. Start the application:
 
 ```bash
 docker compose up --build
-```
-
-Run database migrations:
-
-```bash
-docker compose exec api npx prisma migrate dev
 ```
 
 - API: `http://localhost:3000`
