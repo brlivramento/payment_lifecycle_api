@@ -67,7 +67,12 @@ docker compose exec api npx prisma migrate dev
 | `GET` | `/api/payment` | List payments |
 | `GET` | `/api/payment/:id` | Get payment by ID |
 | `PUT` | `/api/payment/:id` | Update payment status |
-| `POST` | `/api/webhooks/mercado-pago` | Mercado Pago webhook |
+
+## Provider callback
+
+| Method | Route | Description |
+| --- | --- | --- |
+| `POST` | `/api/webhooks/mercado-pago` | Internal Mercado Pago webhook callback |
 
 ## Create a PIX payment
 
