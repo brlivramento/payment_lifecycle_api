@@ -1,8 +1,11 @@
+
 # Payment Lifecycle API
 
 REST API for managing payment lifecycles with PIX and credit card payments.
 
-Credit card payments use Mercado Pago Checkout Pro. Payment status updates are handled through validated webhooks.
+Integrates with Mercado Pago Checkout Pro for credit card payments and uses validated webhooks to process payment status updates.
+
+![Status](https://img.shields.io/badge/status-active-brightgreen)
 
 ## Stack
 
@@ -14,35 +17,65 @@ Credit card payments use Mercado Pago Checkout Pro. Payment status updates are h
 ![Jest](https://img.shields.io/badge/Jest-C21325?style=for-the-badge&logo=jest&logoColor=white)
 ![Swagger](https://img.shields.io/badge/Swagger-85EA2D?style=for-the-badge&logo=swagger&logoColor=black)
 
+## Overview
+
+A backend project developed to explore payment processing, external provider integrations, and reliable transaction management.
+
+The application focuses on request idempotency, payment state management, webhook validation, and separation of business rules from infrastructure.
+
 ## Architecture
 
 ```mermaid
 flowchart LR
-  HTTP["HTTP / Swagger"] --> APP["Application / Use Cases"]
-  APP --> DOMAIN["Domain / Business Rules"]
-  APP --> INFRA["Infrastructure"]
-  INFRA --> DB[("PostgreSQL")]
-  INFRA --> MP["Mercado Pago"]
+    HTTP["HTTP / Swagger"] --> APP["Application / Use Cases"]
+    APP --> DOMAIN["Domain / Business Rules"]
+    APP --> INFRA["Infrastructure"]
+    INFRA --> DB[("PostgreSQL")]
+    INFRA --> MP["Mercado Pago"]
 ```
 
-## Run locally
+## Key Features
 
-#### 1. Create your environment file:
+- PIX and credit card payment methods
+- CPF and request validation
+- Request idempotency through `Idempotency-Key`
+- Payment lifecycle management
+- PostgreSQL persistence with Prisma migrations
+- Mercado Pago Checkout Pro integration
+- Webhook signature validation
+- Unit tests for core use cases
+- Swagger API documentation
+
+## Prerequisites
+
+Make sure Docker and Docker Compose are installed and the Docker engine is running.
+
+A Mercado Pago integration requires the appropriate credentials and webhook configuration.
+
+## Run Locally
+
+1. Clone the repository:
+
+```bash
+git clone git@github.com:USERNAME/REPOSITORY.git
+cd REPOSITORY
+```
+
+2. Create your environment file:
 
 ```bash
 cp .env.example .env
 ```
 
-#### 2. Configure the required values:
+3. Configure the required values:
 
 ```env
-
 MERCADO_PAGO_ACCESS_TOKEN=
 MERCADO_PAGO_WEBHOOK_SECRET=
 MERCADO_PAGO_WEBHOOK_URL=
 ```
 
-#### 3. Start the application:
+4. Start the application:
 
 ```bash
 docker compose up --build
@@ -61,13 +94,23 @@ docker compose up --build
 | `GET` | `/api/payment/:id` | Get payment by ID |
 | `PUT` | `/api/payment/:id` | Update payment status |
 
-## Provider callback
+## External Integrations
+
+| Service | Purpose | Protocol |
+| --- | --- | --- |
+| Mercado Pago | Credit card checkout | REST |
+| Mercado Pago Webhooks | Payment status notifications | HTTP |
+| PostgreSQL | Payment persistence | PostgreSQL |
+
+### Provider Callback
 
 | Method | Route | Description |
 | --- | --- | --- |
-| `POST` | `/api/webhooks/mercado-pago` | Internal Mercado Pago webhook callback |
+| `POST` | `/api/webhooks/mercado-pago` | Mercado Pago webhook callback |
 
-## Create a PIX payment
+## Example Requests
+
+### Create a PIX Payment
 
 ```bash
 curl -X POST http://localhost:3000/api/payment \
@@ -81,7 +124,7 @@ curl -X POST http://localhost:3000/api/payment \
   }'
 ```
 
-## Create a credit card checkout
+### Create a Credit Card Checkout
 
 ```bash
 curl -X POST http://localhost:3000/api/payment \
@@ -97,19 +140,27 @@ curl -X POST http://localhost:3000/api/payment \
 
 The response includes a `checkoutUrl` for Mercado Pago Checkout Pro.
 
-## Key features
+## Tests and Build
 
-- CPF and request validation
-- PIX and credit card payment methods
-- Request idempotency through `Idempotency-Key`
-- PostgreSQL persistence with Prisma migrations
-- Mercado Pago checkout integration
-- Webhook signature validation
-- Unit tests for core use cases
-
-## Tests and build
+Run unit tests:
 
 ```bash
 docker compose exec api npm test -- --runInBand
+```
+
+Build the application:
+
+```bash
 docker compose exec api npm run build
 ```
+
+## Technical Highlights
+
+- Layered architecture and separation of responsibilities
+- Request validation and business rule enforcement
+- Idempotent payment creation
+- Payment status management through validated webhooks
+- Database persistence and schema migrations
+- Integration with an external payment provider
+- Automated unit testing
+- API documentation with Swagger
